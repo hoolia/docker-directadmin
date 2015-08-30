@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: List
+items:
+- kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    name: directadmin
+- kind: SecurityContextConstraints
+  apiVersion: v1
+  metadata: 
+    name: directadmin
+    labels: 
+      name: directadmin
+  allowPrivilegedContainer: true
+  allowHostDirVolumePlugin: false
+  allowHostNetwork: true
+  allowHostPorts: true
+  allowedCapabilities:
+  runAsUser:
+    type: MustRunAsRange
+  seLinuxContext:
+    type: MustRunAs
+  users: 
+  - system:serviceaccounts:default:directadmin
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: directadmin
+  status:
+    latestVersion: 1
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: directadmin
+    strategy:
+      # We set the type of strategy to Recreate, which means that it will be scaled down prior to being scaled up
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentconfig: directadmin
+      spec:
+        serviceAccount: directadmin
+        hostNetwork: true
+        containers:
+        - name: directadmin
+          image: hoolia/directadmin:latest
+          env:
+          - name: ADMIN_PASSWORD
+            value: ietsnieuws
+          - name: IF
+            value: bond0
+          - name: UID
+            value: "8010"
+          - name: LID
+            value: "71407"
+          - name: GLUSTER_VOL
+            value: shared0
+          - name: SERVICE_NAME
+            value: directadmin
+          - name: ROOT_PASSWORD
+            value: container_root_password
+          volumeMounts:
+            - name: shared0-directadmin
+              mountPath: /usr/local/directadmin
+            - name: shared0-directadmin-etc
+              mountPath: /etc/directadmin
+          securityContext:
+            privileged: true
+        volumes:
+        - name: shared0-directadmin
+          glusterfs:
+            endpoints: glusterfs-storage
+            path: shared0
+        - name: shared0-directadmin-etc
+          glusterfs:
+            endpoints: glusterfs-storage
+            path: shared0
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - directadmin
+        from:
+          kind: ImageStreamTag
+          name: directadmin:latest
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: directadmin
+  spec:
+    dockerImageRepository: hoolia/directadmin
