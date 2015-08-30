@@ -6,8 +6,8 @@ MAINTAINER Samuel Terburg <samuel.terburg@panther-it.nl>
 ENV ADMIN_PASSWORD=da_wachtwoord
 
 # UID & LID used to retreive directadmin license
-ENV UID=8010
-ENV LID=71407
+ENV UID=1234
+ENV LID=12345
 
 # Interface to which the Directadmin licensed public ip-address is bound
 ENV IF=bond0
@@ -26,7 +26,7 @@ RUN echo 1   >/root/.lan && \
     echo 2.0 >/root/.custombuild && \
     echo "php_timezone=`cat /etc/timezone`" >>options.conf && \
     echo "redirect_host=$HOSTNAME"          >>options.conf && \
-    curl -sSL http://www.directadmin.com/setup.sh | sh -x -s $UID $LID `hostname`.bridge eth0 
+    curl -sSL http://www.directadmin.com/setup.sh | sh -x -s $UID $LID `hostname`.bridge $IF
 
 #RUN curl -sSL http://files.directadmin.com/services/custombuild/2.0/custombuild.tar.gz |tar xz && \
 #    cd custombuild && \
