@@ -47,13 +47,13 @@ items:
           image: hoolia/directadmin:latest
           env:
           - name: ADMIN_PASSWORD
-            value: ietsnieuws
+            value: blablabla
           - name: IF
             value: bond0
           - name: UID
-            value: "8010"
+            value: "1234"
           - name: LID
-            value: "71407"
+            value: "12345"
           - name: GLUSTER_VOL
             value: shared0
           - name: SERVICE_NAME
