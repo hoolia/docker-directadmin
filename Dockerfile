@@ -89,4 +89,7 @@ RUN rm -f conf/license.key         && \
     perl -pi -e "s/^ip=.*//g" data/users/admin/user.conf && \
     perl -pi -e "s/^ip=.*//g" scripts/setup.txt
 
+RUN chown root  /usr/local/directadmin /etc -R && \
+    chmod a+rwX /usr/local/directadmin /etc -R
+
 CMD ["/usr/local/bin/start.sh"]
